@@ -5,11 +5,11 @@
 
     IHtmlContent RenderNavItems(IEnumerable<VersOne.Epub.EpubNavigationItem> items) =>
         new Func<object?, IHtmlContent>(
-            @<ul class="nav nav-pills flex-column mb-auto">
+            @<ul class="nav nav-pills flex-column mb-auto" style="padding-left: 0.5em">
                 @foreach (var item in items)
                 {
                     <li class="nav-item">
-                        <a class="nav-link link-dark" onclick="scrollToAnchor('@item.Link?.ContentFileUrl', '@item.Link?.Anchor')">@item.Title</a>
+                        <a class="nav-link link-dark" data-iframe="@item.Link?.ContentFilePath.Substring((item.Link?.ContentFilePath.IndexOf('/') ?? -1) + 1)" data-a="@item.Link?.Anchor" onclick="scrollToAnchor(this.dataset.iframe, this.dataset.a);">@item.Title</a>
                         @if (item.NestedItems != null && item.NestedItems.Any())
                         {
                             @RenderNavItems(item.NestedItems)
@@ -20,78 +20,200 @@
         )(null);
 }
 
+<script>
+    function resizeIframe(iframe) {
+      if (!iframe) return;
+
+      function updateSize() {
+        const html = iframe.contentDocument.documentElement;
+        const height = html.getBoundingClientRect().height + 50;
+        iframe.style.height = height + 'px';
+      }
+
+      updateSize();
+      new ResizeObserver(updateSize).observe(iframe.contentDocument.body);
+    }
+
+    let lastScrollY = null;
+    function scrollToAnchor(iframeId, anchorId) {
+      console.log('Scrolling to', iframeId + '#' + anchorId);
+      if (!iframeId) return;
+      const iframe = document.getElementById(iframeId);
+      if (!iframe) return;
+      scrollState.lastScrollY = window.scrollY;
+      if (anchorId) {
+        const doc = iframe.contentDocument;
+        const target = doc.getElementById(anchorId) || doc.querySelector(`[name='${anchorId}']`);
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      } else iframe.scrollIntoView({ behavior: 'smooth' });
+    }
+
+
+    const scrollState = {
+      _lastScrollY: null,
+
+      set lastScrollY(value) {
+        if(this._lastScrollY === value) return;
+        this._lastScrollY = value;
+        document.getElementById('goBackBtn').style.display = value === null ? '' : 'block';
+
+        if(value !== null)
+          setTimeout(() => {
+            scrollState.lastScrollY = null;
+          }, 5000);
+      },
+
+      get lastScrollY() {
+        return this._lastScrollY;
+      }
+    };
+
+    function goBack() {
+      if (scrollState.lastScrollY !== null) {
+        window.scrollTo({ top: scrollState.lastScrollY, behavior: 'smooth' });
+        scrollState.lastScrollY = null;
+      }
+    }
+
+    function injectLinkScript(iframe) {
+      const doc = iframe.contentDocument;
+      const script = doc.createElement('script');
+      script.textContent = `
+                  (function () {
+                    document.querySelectorAll('a[href]').forEach((link) => {
+                      link.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        if (this.href.includes(location.origin)) {
+                          let path = this.href.replace(location.origin + '/resources/', '');
+                          let [key, a] = path.split('#');
+                          window.parent.scrollToAnchor(key, a);
+                        } else { window.parent.open(this.href, '_blank'); }
+                      });
+                    });
+                  })();
+                `;
+      doc.head.appendChild(script);
+    }
+
+    let currentIframe;
+    let currentAnchor;
+    function SecChanged(iframe, anchor) {
+      let aid = '';
+      if (anchor) aid = anchor.id || anchor.name;
+      if (currentIframe === iframe.id && currentAnchor === aid) return;
+      console.log('Scrolled to ', iframe.id + '#' + aid);
+      currentIframe = iframe.id;
+      currentAnchor = aid;
+      for (const a of document.querySelectorAll('a.nav-link')) {
+        const isActive = a.dataset.iframe === currentIframe && a.dataset.a === currentAnchor;
+        a.classList.toggle('active', isActive);
+        a.classList.toggle('link-dark', !isActive);
+      }
+
+      const activeLink = document.querySelector(`a.nav-link.active`);
+      if (activeLink) {
+        const container = document.getElementById('sideBar');
+        const linkRect = activeLink.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+
+        if (linkRect.top < containerRect.top || linkRect.bottom > containerRect.bottom) {
+          activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+      }
+    }
+
+    function scrolled() {
+      for (const iframe of document.querySelectorAll('iframe')) {
+        const rect = iframe.getBoundingClientRect();
+        const visibleRatio = rect.height > 0 ? (Math.min(window.innerHeight, rect.bottom) - Math.max(0, rect.top)) / window.innerHeight : 0;
+        if (visibleRatio > 0.6) {
+          SecChanged(iframe, getCurrentAnchorFromParentScroll(iframe));
+          break;
+        }
+      }
+    }
+
+    window.addEventListener('scroll', scrolled);
+
+    let navAnchors;
+    const anchorSet = {};
+    function getCurrentAnchorFromParentScroll(iframe) {
+      let current = null;
+      let minDistance = Infinity;
+      navAnchors ??= Array.from(document.getElementById('sideBar').querySelectorAll('a.nav-link'), (a) => a.dataset.a);
+      let anchors = (anchorSet[iframe.id] ??= Array.from(
+        (iframe.contentDocument || iframe.contentWindow.document).querySelectorAll('[id], [name]')
+      ).filter((el) => navAnchors.includes(el.id || el.name)));
+
+      for (const anchor of anchors) {
+        const rect = anchor.getBoundingClientRect();
+        const iframeRect = iframe.getBoundingClientRect();
+
+        // Anchor position relative to parent viewport
+        const anchorTopInParent = rect.top + iframeRect.top;
+
+        if (anchorTopInParent <= 200 && Math.abs(anchorTopInParent) < minDistance) {
+          minDistance = Math.abs(anchorTopInParent);
+          current = anchor;
+          if (minDistance < 200) break;
+        }
+      }
+
+      return current;
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sideBar');
+      const divider = document.getElementById('sidebar-divider');
+      const toState = sidebar.style.display === 'none' ? '' : 'none';
+      sidebar.style.display = toState;
+      divider.style.display = toState;
+    }
+</script>
+
 <div style="display: flex;">
-    <div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="overflow-y: auto; max-height: 100vh; position: sticky; top: 0;">
+    <div id="sideBar" class="flex-column flex-shrink-0 p-3 bg-light">
+        <div id="sidebar-title-container" style="display: none;">
+            <h2>@ViewData["Title"]</h2>
+            <hr />
+        </div>
         @RenderNavItems(Model.Book?.Navigation ?? [])
     </div>
 
-    <div style="box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15); width: 1em;"></div>
+    <div id="sidebar-divider"></div>
 
     <div style="flex: 1;">
         @foreach (var item in Model.Book?.ReadingOrder ?? [])
         {
-           <iframe src="resources/@item.Key" id="@item.Key" onload="resizeIframe(this); injectLinkScript(this);"></iframe>
+            <iframe src="/resources/@item.Key" id="@item.Key" onload="resizeIframe(this); injectLinkScript(this);"></iframe>
         }
     </div>
 </div>
 
+<button id="goBackBtn" class="btn btn-primary position-fixed bottom-0 end-0 m-3" onclick="goBack();">
+    <i class="bi bi-arrow-90deg-up"></i> Back
+</button>
+
+<button id="sidebarToggleBtn" class="btn btn-primary position-fixed bottom-0 start-0 m-3" onclick="toggleSidebar();">
+    <i class="bi bi-toggle-off"></i> Sidebar
+</button>
 
 @section Scripts {
-    <script>
-        function resizeIframe(iframe) {
-          if (!iframe) return;
+    <script defer>
+        scrolled();
 
-          function updateSize() {
-            const html = iframe.contentDocument.documentElement;
-            const height = html.getBoundingClientRect().height + 50;
-            iframe.style.height = height + 'px';
-          }
-
-          updateSize();
-          new ResizeObserver(updateSize).observe(iframe.contentDocument.body);
-        }
-
-        function scrollToAnchor(iframeId, anchorId) {
-          if (!iframeId) return;
-          const iframe = document.getElementById(iframeId);
-          if (!iframe) return;
-          if (anchorId) {
-            const doc = iframe.contentDocument;
-            const target = doc.getElementById(anchorId) || doc.querySelector(`[name='${anchorId}']`);
-            if (target) target.scrollIntoView({ behavior: 'smooth' });
-          } else iframe.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function injectLinkScript(iframe) {
-            const doc = iframe.contentDocument;
-            const script = doc.createElement('script');
-            script.textContent = `
-              (function () {
-                document.querySelectorAll('a[href]').forEach((link) => {
-                  link.addEventListener('click', function (e) {
-                    let link = this.href;
-                    if (!h.includes(location.origin)) {
-                      e.preventDefault();
-                      let path = link.replace(location.origin + '/', '');
-                      let [key, a] = path.split('#');
-                      window.parent.scrollToAnchor(key, a);
-                    }
-                  });
-                });
-              })();
-            `;
-            doc.head.appendChild(script);
-        }
-
-        window.addEventListener('scroll', () => {
-          for(const iframe of document.querySelectorAll('iframe')){
-            const rect = iframe.getBoundingClientRect();
-            const visibleRatio = rect.height > 0 ? (Math.min(window.innerHeight, rect.bottom) - Math.max(0, rect.top)) / window.innerHeight : 0;
-            if (visibleRatio > 0.6) {
-              window.chrome.webview.postMessage("{{Constants.ScrollMessageHead}}" + iframe.id);
-              break;
+        const sidebarTitleContainer = document.querySelector('#sidebar-title-container');
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              // Nav bar is visible
+              sidebarTitleContainer.style.display = 'none';
+            } else {
+              // Nav bar is invisible
+              sidebarTitleContainer.style.display = 'block';
             }
-          }
-        });
+          });
+        }, { threshold: 0 });
+        observer.observe(document.querySelector('.navbar'));
     </script>
 }

@@ -11,7 +11,7 @@
     },
     "https": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\chenf\\source\\TestMaterial\\wasteland-woff-obf.epub\"",
+      "commandLineArgs": "\"C:\\Users\\chenf\\OneDrive\\轻小说\\[依空まつり] Silent Witch 沉默魔女的秘密\\[依空まつり  藤実なんな] Silent Witch 沉默魔女的秘密 第一卷 (Z-Library).epub\"",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
