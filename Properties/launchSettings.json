@@ -1,15 +1,6 @@
 {
   "profiles": {
-    "http": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5233"
-    },
-    "https": {
+    "rundev": {
       "commandName": "Project",
       "commandLineArgs": "\"C:\\Users\\chenf\\OneDrive\\轻小说\\[依空まつり] Silent Witch 沉默魔女的秘密\\[依空まつり  藤実なんな] Silent Witch 沉默魔女的秘密 第一卷 (Z-Library).epub\"",
       "launchBrowser": true,
@@ -17,7 +8,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7199;http://localhost:5233"
+      "applicationUrl": "http://localhost:5233"
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json"

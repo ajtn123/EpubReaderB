@@ -1,8 +1,17 @@
 using EpubReaderB;
 
-var builder = WebApplication.CreateBuilder(args);
+if (Environment.ProcessPath is string processPath)
+    if (new FileInfo(processPath).DirectoryName is string dir)
+        Environment.CurrentDirectory = dir;
 
 StartupState.EpubPath = args.Length > 0 ? args[0] : null;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenLocalhost(5000);
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -13,11 +22,8 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthorization();
