@@ -1,0 +1,97 @@
+﻿@using Microsoft.AspNetCore.Html
+@model ReaderViewModel
+@{
+    ViewData["Title"] = Model.Book?.Title ?? "Untitled";
+
+    IHtmlContent RenderNavItems(IEnumerable<VersOne.Epub.EpubNavigationItem> items) =>
+        new Func<object?, IHtmlContent>(
+            @<ul class="nav nav-pills flex-column mb-auto">
+                @foreach (var item in items)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link link-dark" onclick="scrollToAnchor('@item.Link?.ContentFileUrl', '@item.Link?.Anchor')">@item.Title</a>
+                        @if (item.NestedItems != null && item.NestedItems.Any())
+                        {
+                            @RenderNavItems(item.NestedItems)
+                        }
+                    </li>
+                }
+            </ul>
+        )(null);
+}
+
+<div style="display: flex;">
+    <div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="overflow-y: auto; max-height: 100vh; position: sticky; top: 0;">
+        @RenderNavItems(Model.Book?.Navigation ?? [])
+    </div>
+
+    <div style="box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15); width: 1em;"></div>
+
+    <div style="flex: 1;">
+        @foreach (var item in Model.Book?.ReadingOrder ?? [])
+        {
+           <iframe src="resources/@item.Key" id="@item.Key" onload="resizeIframe(this); injectLinkScript(this);"></iframe>
+        }
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        function resizeIframe(iframe) {
+          if (!iframe) return;
+
+          function updateSize() {
+            const html = iframe.contentDocument.documentElement;
+            const height = html.getBoundingClientRect().height + 50;
+            iframe.style.height = height + 'px';
+          }
+
+          updateSize();
+          new ResizeObserver(updateSize).observe(iframe.contentDocument.body);
+        }
+
+        function scrollToAnchor(iframeId, anchorId) {
+          if (!iframeId) return;
+          const iframe = document.getElementById(iframeId);
+          if (!iframe) return;
+          if (anchorId) {
+            const doc = iframe.contentDocument;
+            const target = doc.getElementById(anchorId) || doc.querySelector(`[name='${anchorId}']`);
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+          } else iframe.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function injectLinkScript(iframe) {
+            const doc = iframe.contentDocument;
+            const script = doc.createElement('script');
+            script.textContent = `
+              (function () {
+                document.querySelectorAll('a[href]').forEach((link) => {
+                  link.addEventListener('click', function (e) {
+                    let link = this.href;
+                    if (!h.includes(location.origin)) {
+                      e.preventDefault();
+                      let path = link.replace(location.origin + '/', '');
+                      let [key, a] = path.split('#');
+                      window.parent.scrollToAnchor(key, a);
+                    }
+                  });
+                });
+              })();
+            `;
+            doc.head.appendChild(script);
+        }
+
+        window.addEventListener('scroll', () => {
+          for(const iframe of document.querySelectorAll('iframe')){
+            const rect = iframe.getBoundingClientRect();
+            const visibleRatio = rect.height > 0 ? (Math.min(window.innerHeight, rect.bottom) - Math.max(0, rect.top)) / window.innerHeight : 0;
+            if (visibleRatio > 0.6) {
+              window.chrome.webview.postMessage("{{Constants.ScrollMessageHead}}" + iframe.id);
+              break;
+            }
+          }
+        });
+    </script>
+}
