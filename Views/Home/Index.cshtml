@@ -149,9 +149,13 @@
     const toAnchor = new URLSearchParams(window.location.search).get('toAnchor');
     scrollToAnchor(toIframe, toAnchor);
   });
+
+  window.addEventListener("DOMContentLoaded", () => {
+    if (window.innerWidth < 576) toggleSidebar();
+  });
 </script>
 
-<div style="display: flex;">
+<div id="reader-container">
   <div id="sideBar" class="flex-column flex-shrink-0 p-3 bg-light">
     <div id="sidebar-title-container" style="display: none;">
       <h2>@ViewData["Title"]</h2>
