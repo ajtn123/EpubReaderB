@@ -35,6 +35,7 @@
         const doc = iframe.contentDocument;
         const target = doc.getElementById(anchorId) || doc.querySelector(`[name='${anchorId}']`);
         if (target) target.scrollIntoView({ behavior: 'smooth' });
+        else iframe.scrollIntoView({ behavior: 'smooth' });
       } else iframe.scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -139,7 +140,7 @@
       sidebar.style.display = toState;
       divider.style.display = toState;
     }
-    
+
     window.addEventListener('load', () => {
       const toIframe = new URLSearchParams(window.location.search).get('toIframe');
       const toAnchor = new URLSearchParams(window.location.search).get('toAnchor');
