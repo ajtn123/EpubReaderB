@@ -1,7 +1,8 @@
 ﻿@model NavPageViewModel
 @{
-    ViewData["BookTitle"] = (Model.Book?.Title ?? "Untitled");
-    ViewData["Title"] = (Model.Book?.Title ?? "Untitled") + " - Nav";
+    ViewData["BookTitle"] = Model.BookTitle;
+    ViewData["Title"] = Model.Title;
+    ViewData["BookCopyright"] = Model.BookCopyright;
     ViewData["NavHtmlErrorMessage"] = Model.Book?.Content.NavigationHtmlFile?.Key == null ? "This book does not have a nav page." : "";
 }
 

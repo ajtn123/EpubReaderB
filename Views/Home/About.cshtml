@@ -1,0 +1,26 @@
+﻿@model AboutViewModel
+@{
+    ViewData["BookTitle"] = Model.BookTitle;
+    ViewData["Title"] = Model.Title;
+    ViewData["BookCopyright"] = Model.BookCopyright;
+}
+
+<article class="p-5" id="about-book">
+    <div class="d-flex mb-3"
+        style="background-image: url('/resources/@Model.Book?.Content.Cover?.Key'); background-size: contain; background-repeat: no-repeat; background-position: right;">
+        <div id="about-book-info"
+            style="background: linear-gradient(to right, var(--bs-body-bg) 0%, rgba(255, 255, 255, 0) 100%);">
+            <h1>@ViewData["BookTitle"]</h1>
+            <address>@Model.Book?.Author <span class="text-secondary">@Model.Publishers</span></address>
+            <div class="mb-3">
+                @foreach (var tag in Model.Book?.Schema.Package.Metadata.Subjects ?? [])
+                {
+                    <span class="badge rounded-pill bg-success">@tag.Subject</span>
+                }
+            </div>
+            <p class="text-area mb-0">@Model.Book?.Description</p>
+        </div>
+    </div>
+    <pre class="code-area">@Model.PackageInfo</pre>
+    <p class="text-area">@Model.Rights</p>
+</article>

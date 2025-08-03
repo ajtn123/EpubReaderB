@@ -84,3 +84,23 @@ iframe {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
+
+.code-area {
+    overflow: auto;
+    background: #f4f4f4;
+    padding: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.text-area {
+    white-space: pre-wrap;
+}
+
+#about-book-info {
+    text-shadow: 0 0 5px var(--bs-body-bg);
+}
+
+#about-book-info .badge {
+    text-shadow: none;
+}

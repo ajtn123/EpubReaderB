@@ -1,7 +1,11 @@
 ﻿using EpubReaderB.Controllers;
+using Microsoft.AspNetCore.WebUtilities;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 using System.Xml.Linq;
 using VersOne.Epub;
 
@@ -89,4 +93,6 @@ public static class Utils
         cloned.Position = 0;
         return cloned;
     }
+
+    public static JsonSerializerOptions JsonSerializerOptions { get; set; } = new() { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
 }

@@ -2,6 +2,7 @@
   "profiles": {
     "rundev": {
       "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\chenf\\source\\TestMaterial\\epub30-spec.epub\"",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

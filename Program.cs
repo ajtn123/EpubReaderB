@@ -1,7 +1,6 @@
 using EpubReaderB;
 
-if (args.Length > 0)
-    EpubInfo.InitializeBook(new FileInfo(args[0]));
+Task<bool>? task = args.Length > 0 ? EpubInfo.InitializeBook(new FileInfo(args[0])) : null;
 
 if (Environment.ProcessPath is string processPath)
     if (new FileInfo(processPath).DirectoryName is string dir)
@@ -31,5 +30,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+if (task != null) await task;
 
 app.Run();

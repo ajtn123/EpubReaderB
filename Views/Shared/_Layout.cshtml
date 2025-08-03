@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,6 +11,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/EpubReaderB.styles.css" asp-append-version="true" />
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow">
@@ -18,25 +20,32 @@
                     <img src="~/assets/book.svg" />
                     EpubReaderB
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">@ViewData["BookTitle"]</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home"
+                                asp-action="Index">@ViewData["BookTitle"]</a>
                         </li>
                     </ul>
 
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
-                            <button class="d-flex align-items-center justify-content-center btn btn-outline-secondary p-0 dropdown-toggle" style="width: 50px; height: 35px;" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <button
+                                class="d-flex align-items-center justify-content-center btn btn-outline-secondary p-0 dropdown-toggle"
+                                style="width: 50px; height: 35px;" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
                                 <i class="bi bi-list fs-1"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="NavPage">NavPage</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="NavPage">
+                                    Navigation
+                                </a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Cover">Cover</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="About">About</a>
                             </ul>
                         </li>
                     </ul>
@@ -53,9 +62,15 @@
         @RenderBody()
     </main>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 · EpubReaderB · <a href="https://github.com/ajtn123/EpubReaderB"><i class="bi bi-github"></i>GitHub</a> · <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="border-top footer text-muted" style="overflow:auto;">
+        <div class="container d-flex justify-content-between">
+            <span>
+                <a href="https://github.com/ajtn123/EpubReaderB"><i class="bi bi-github"></i>EpubReaderB</a> - MIT
+                &copy; 2025 aoi - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </span>
+            <span style="margin-left: 2em;">
+                @ViewData["BookCopyright"]
+            </span>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -64,4 +79,5 @@
     <script>window.injectedStyles = '@EpubInfo.Styles';</script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

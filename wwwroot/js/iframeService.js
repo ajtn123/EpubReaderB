@@ -30,6 +30,8 @@ function injectScript(iframe) {
             style.type = 'text/css';
             style.innerHTML = window.parent.injectedStyles;
             document.head.prepend(style);
+            document.addEventListener('dragover', e => { e.preventDefault(); });
+            document.addEventListener('drop', async e => { e.preventDefault(); });
         `;
     doc.head.appendChild(script);
 }
