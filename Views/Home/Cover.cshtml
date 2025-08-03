@@ -1,0 +1,7 @@
+﻿@model CoverViewModel
+@{
+    ViewData["BookTitle"] = (Model.Book?.Title ?? "Untitled");
+    ViewData["Title"] = (Model.Book?.Title ?? "Untitled") + " - Cover";
+}
+
+<img src="/resources/@Model.Book?.Content.Cover?.Key" style="height: calc(100vh - 50px); width: 100%; object-fit: contain;" alt="Book Cover" onerror="this.outerHTML='<span>This book does not have a cover.</span>';" />

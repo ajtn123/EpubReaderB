@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using VersOne.Epub;
 
 namespace EpubReaderB.Controllers;
 
@@ -20,9 +21,21 @@ public class ResourceController : Controller
 
     public static void AddFile(string name, byte[] content, string? mimeType = null)
         => _files[name] = (content, string.IsNullOrWhiteSpace(mimeType) ? GetMimeType(name) : mimeType);
-    public static void AddFile(string name, string text, string? mimeType = null)
-        => AddFile(name, System.Text.Encoding.UTF8.GetBytes(text), mimeType);
+    public static void AddFile(string name, string content, string? mimeType = null)
+        => AddFile(name, System.Text.Encoding.UTF8.GetBytes(content), mimeType);
 
+    public static void AddRes(EpubLocalTextContentFile file)
+        => AddFile(file.Key, file.Content, file.ContentMimeType);
+    public static void AddRes(EpubLocalByteContentFile file)
+        => AddFile(file.Key, file.Content, file.ContentMimeType);
+
+    public static bool AddResAll(EpubBook book)
+    {
+        foreach (var res in book.Content.AllFiles.Local)
+            if (res is EpubLocalTextContentFile t) AddRes(t);
+            else if (res is EpubLocalByteContentFile b) AddRes(b);
+        return true;
+    }
 
     private static readonly FileExtensionContentTypeProvider _typeProvider = new();
     private static string GetMimeType(string fileName) =>

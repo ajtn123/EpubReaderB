@@ -1,0 +1,26 @@
+﻿@model NavPageViewModel
+@{
+    ViewData["BookTitle"] = (Model.Book?.Title ?? "Untitled");
+    ViewData["Title"] = (Model.Book?.Title ?? "Untitled") + " - Nav";
+}
+
+<script>
+    function resizeIframe(iframe) {
+      if (!iframe) return;
+
+      function updateSize() {
+        const html = iframe.contentDocument.documentElement;
+        const height = html.getBoundingClientRect().height + 50;
+        iframe.style.height = height + 'px';
+      }
+
+      updateSize();
+      new ResizeObserver(updateSize).observe(iframe.contentDocument.body);
+    }
+
+    function showError(iframe) {
+        iframe.outerHTML='<span>This book does not have a nav page.</span>';
+    }
+</script>
+
+<iframe src="/resources/@Model.Book?.Content.NavigationHtmlFile?.Key" onload="resizeIframe(this)" onerror="showError(this)';"></iframe>

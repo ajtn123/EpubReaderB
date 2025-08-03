@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Html
 @model ReaderViewModel
 @{
+    ViewData["BookTitle"] = Model.Book?.Title ?? "Untitled";
     ViewData["Title"] = Model.Book?.Title ?? "Untitled";
 
     IHtmlContent RenderNavItems(IEnumerable<VersOne.Epub.EpubNavigationItem> items) =>
