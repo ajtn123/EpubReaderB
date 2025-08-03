@@ -12,7 +12,7 @@ Right click on an EPUB file in explorer > Open with > More > Select other deskto
 
 ## Usage
 
-### Open server
+### Start server
 
 If EpubReaderB is the default app for EPUB files, double click on any EPUB file in explorer.
 
