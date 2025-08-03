@@ -1,7 +1,7 @@
 using EpubReaderB;
 
 if (args.Length > 0)
-    EpubInfo.InitializeBook(new(args[0]));
+    EpubInfo.InitializeBook(new FileInfo(args[0]));
 
 if (Environment.ProcessPath is string processPath)
     if (new FileInfo(processPath).DirectoryName is string dir)

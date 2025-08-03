@@ -11,9 +11,11 @@ public class ResourceController : Controller
     [HttpGet("/resources/{*name}")]
     public IActionResult Get(string name)
     {
-        if (_files.TryGetValue(name, out var file))
+        if (name == null)
+            return NotFound();
+        else if (_files.TryGetValue(name, out var file))
             return File(file.Content, file.MimeType);
-        if (Uri.TryCreate(name, UriKind.Absolute, out _))
+        else if (Uri.TryCreate(name, UriKind.Absolute, out _))
             return Redirect(name);
         else
             return NotFound();

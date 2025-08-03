@@ -21,24 +21,13 @@
         )(null);
 }
 
+<script src="~/js/iframeService.js" asp-append-version="true"></script>
+
 <script>
-    function resizeIframe(iframe) {
-      if (!iframe) return;
-
-      function updateSize() {
-        const html = iframe.contentDocument.documentElement;
-        const height = html.getBoundingClientRect().height + 50;
-        iframe.style.height = height + 'px';
-      }
-
-      updateSize();
-      new ResizeObserver(updateSize).observe(iframe.contentDocument.body);
-    }
-
     let lastScrollY = null;
     function scrollToAnchor(iframeId, anchorId) {
-      console.log('Scrolling to', iframeId + '#' + anchorId);
       if (!iframeId) return;
+      console.log('Scrolling to', iframeId + '#' + anchorId);
       const iframe = document.getElementById(iframeId);
       if (!iframe) return;
       scrollState.lastScrollY = window.scrollY;
@@ -74,26 +63,6 @@
         window.scrollTo({ top: scrollState.lastScrollY, behavior: 'smooth' });
         scrollState.lastScrollY = null;
       }
-    }
-
-    function injectLinkScript(iframe) {
-      const doc = iframe.contentDocument;
-      const script = doc.createElement('script');
-      script.textContent = `
-                  (function () {
-                    document.querySelectorAll('a[href]').forEach((link) => {
-                      link.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        if (this.href.includes(location.origin)) {
-                          let path = this.href.replace(location.origin + '/resources/', '');
-                          let [key, a] = path.split('#');
-                          window.parent.scrollToAnchor(key, a);
-                        } else { window.parent.open(this.href, '_blank'); }
-                      });
-                    });
-                  })();
-                `;
-      doc.head.appendChild(script);
     }
 
     let currentIframe;
@@ -170,6 +139,12 @@
       sidebar.style.display = toState;
       divider.style.display = toState;
     }
+    
+    window.addEventListener('load', () => {
+      const toIframe = new URLSearchParams(window.location.search).get('toIframe');
+      const toAnchor = new URLSearchParams(window.location.search).get('toAnchor');
+      scrollToAnchor(toIframe, toAnchor);
+    });
 </script>
 
 <div style="display: flex;">

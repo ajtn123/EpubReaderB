@@ -1,43 +1,48 @@
 ﻿using EpubReaderB.Controllers;
-using EpubReaderB.Models;
-using System.IO;
-using System.IO.Compression;
-using System.Net.WebSockets;
 using VersOne.Epub;
 
 namespace EpubReaderB;
 
 public static class EpubInfo
 {
-    public static void InitializeBook(FileInfo file)
+    public static async Task<bool> InitializeBook(FileInfo file)
     {
         EpubFile = file;
 
-        EpubStream?.Dispose();
-        EpubStream = null;
+        Stream? stream = null;
         if (EpubFile != null && EpubFile.Exists)
             try
             {
                 Console.WriteLine($"Reading file: {EpubFile.FullName}");
-                EpubStream = new MemoryStream(File.ReadAllBytes(EpubFile.FullName));
+                stream = new MemoryStream(await File.ReadAllBytesAsync(EpubFile.FullName));
             }
             catch (Exception e) { Console.WriteLine(e.Message); }
+
+        if (stream != null) return await InitializeBook(stream);
+        else return IsInitialized = false;
+    }
+
+    public static async Task<bool> InitializeBook(Stream stream)
+    {
+        EpubStream?.Dispose();
+        EpubStream = stream;
 
         EpubBook = null;
         if (EpubStream != null)
             try
             {
-                EpubBook = EpubReader.ReadBook(EpubStream.Clone());
+                EpubBook = await EpubReader.ReadBookAsync(EpubStream.Clone());
             }
             catch (Exception e) { Console.WriteLine(e.Message); }
 
-        if (EpubBook == null || EpubStream == null) return;
+        if (EpubBook == null || EpubStream == null)
+            return IsInitialized = false;
 
         _ = ResourceController.AddResAll(EpubBook);
 
         Utils.Deobfuscate(EpubBook, EpubStream);
 
-        IsInitialized = true;
+        return IsInitialized = true;
     }
 
     public static bool IsInitialized { get; private set; } = false;

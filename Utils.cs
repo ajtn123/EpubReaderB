@@ -1,5 +1,4 @@
 ﻿using EpubReaderB.Controllers;
-using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;

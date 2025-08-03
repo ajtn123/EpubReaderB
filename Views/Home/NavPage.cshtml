@@ -2,25 +2,29 @@
 @{
     ViewData["BookTitle"] = (Model.Book?.Title ?? "Untitled");
     ViewData["Title"] = (Model.Book?.Title ?? "Untitled") + " - Nav";
+    ViewData["NavHtmlErrorMessage"] = Model.Book?.Content.NavigationHtmlFile?.Key == null ? "This book does not have a nav page." : "";
 }
 
+<script src="~/js/iframeService.js" asp-append-version="true"></script>
+
 <script>
-    function resizeIframe(iframe) {
-      if (!iframe) return;
-
-      function updateSize() {
-        const html = iframe.contentDocument.documentElement;
-        const height = html.getBoundingClientRect().height + 50;
-        iframe.style.height = height + 'px';
+    function scrollToAnchor(iframeId, anchorId) {
+      console.log('Scrolling to', iframeId + '#' + anchorId);
+      if (!iframeId) return;
+      const iframe = document.getElementById(iframeId);
+      if (iframe) {
+        scrollState.lastScrollY = window.scrollY;
+        if (anchorId) {
+          const doc = iframe.contentDocument;
+          const target = doc.getElementById(anchorId) || doc.querySelector(`[name='${anchorId}']`);
+          if (target) target.scrollIntoView({ behavior: 'smooth' });
+        } else iframe.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        window.location.href = `/?toIframe=${iframeId}&toAnchor=${anchorId}`;
       }
-
-      updateSize();
-      new ResizeObserver(updateSize).observe(iframe.contentDocument.body);
-    }
-
-    function showError(iframe) {
-        iframe.outerHTML='<span>This book does not have a nav page.</span>';
     }
 </script>
 
-<iframe src="/resources/@Model.Book?.Content.NavigationHtmlFile?.Key" onload="resizeIframe(this)" onerror="showError(this)';"></iframe>
+<iframe src="/resources/@Model.Book?.Content.NavigationHtmlFile?.Key" onload="resizeIframe(this); injectLinkScript(this);"></iframe>
+
+<span>@ViewData["NavHtmlErrorMessage"]</span>
