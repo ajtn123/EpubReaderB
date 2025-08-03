@@ -11,23 +11,25 @@
     new ResizeObserver(updateSize).observe(iframe.contentDocument.body);
 }
 
-
-function injectLinkScript(iframe) {
+function injectScript(iframe) {
     const doc = iframe.contentDocument;
     const script = doc.createElement('script');
     script.textContent = `
-                  (function () {
-                    document.querySelectorAll('a[href]').forEach((link) => {
-                      link.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        if (this.href.includes(location.origin)) {
-                          let path = this.href.replace(location.origin + '/resources/', '');
-                          let [key, a] = path.split('#');
-                          window.parent.scrollToAnchor(key, a);
-                        } else { window.parent.open(this.href, '_blank'); }
-                      });
-                    });
-                  })();
-                `;
+            document.querySelectorAll('a[href]').forEach((link) => {
+              link.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (this.href.includes(location.origin)) {
+                  const path = this.href.replace(location.origin + '/resources/', '');
+                  const [key, a] = path.split('#');
+                  window.parent.scrollToAnchor(key, a);
+                } else { window.parent.open(this.href, '_blank'); }
+              });
+            });
+
+            const style = document.createElement('style');
+            style.type = 'text/css';
+            style.innerHTML = window.parent.injectedStyles;
+            document.head.prepend(style);
+        `;
     doc.head.appendChild(script);
 }

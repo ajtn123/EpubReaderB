@@ -42,6 +42,10 @@ public static class EpubInfo
 
         Utils.Deobfuscate(EpubBook, EpubStream);
 
+        if (File.Exists("styles.css"))
+            Styles = await File.ReadAllTextAsync("styles.css");
+        else Styles = "";
+
         return IsInitialized = true;
     }
 
@@ -50,4 +54,6 @@ public static class EpubInfo
     public static FileInfo? EpubFile { get; set; }
     public static Stream? EpubStream { get; set; }
     public static EpubBook? EpubBook { get; set; }
+
+    public static string Styles { get; set; } = "";
 }

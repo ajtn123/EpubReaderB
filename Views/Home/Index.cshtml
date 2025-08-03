@@ -162,7 +162,7 @@
     <div style="flex: 1;">
         @foreach (var item in Model.Book?.ReadingOrder ?? [])
         {
-            <iframe src="/resources/@item.Key" id="@item.Key" onload="resizeIframe(this); injectLinkScript(this);"></iframe>
+            <iframe src="/resources/@item.Key" id="@item.Key" onload="resizeIframe(this); injectScript(this);"></iframe>
         }
     </div>
 </div>
@@ -180,6 +180,7 @@
         scrolled();
 
         const sidebarTitleContainer = document.querySelector('#sidebar-title-container');
+        sidebarTitleContainer.style.maxWidth = `${document.querySelector('#sideBar > ul.nav').offsetWidth}px`;
         const observer = new IntersectionObserver(entries => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
