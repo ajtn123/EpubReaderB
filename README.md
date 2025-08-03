@@ -1,5 +1,7 @@
 # EpubReaderB
 
+[简体中文 zh-CN](#使用)
+
 Read EPUB books in any browser.
 
 ## Install
@@ -35,3 +37,17 @@ http://<Host IP>:5000
 As this only supports http, aviod usage in public networks.
 
 Drop an EPUB file onto the browser tab to switch book.
+
+---
+
+EPUB 阅读器
+
+## 使用
+
+下载 release 并解压，双击打开 EpubReaderB.exe。
+
+任意浏览器访问：`http://localhost:5000`
+
+如果添加了防火墙规则，则可以在任意其他设备的浏览器访问：`http://<主机 IP>:5000`
+
+将 EPUB 文件拖动到打开的浏览器标签页即可开始阅读。在任意设备打开一个 EPUB，就可以在其他设备同步显示。
