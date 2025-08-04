@@ -5,7 +5,7 @@ namespace EpubReaderB.Models;
 
 public class AboutViewModel(EpubBook? book) : BookViewModelBase(book)
 {
-    public new string Title => base.Title + "About - ";
+    public new string Title => "About - " + base.Title;
 
     public string PackageInfo { get; set; } = JsonSerializer.Serialize(book?.Schema.Package, Utils.JsonSerializerOptions);
     public string Rights { get; set; } = string.Join('\n', book?.Schema.Package.Metadata.Rights.Select(x => x.Rights) ?? []);
