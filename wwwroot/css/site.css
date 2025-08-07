@@ -121,7 +121,6 @@ iframe {
 }
 
 .code-area {
-  overflow: auto;
   background: #f4f4f4;
   padding: 16px;
   border: 1px solid #ccc;
