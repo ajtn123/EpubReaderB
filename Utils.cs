@@ -1,11 +1,12 @@
 ﻿using EpubReaderB.Controllers;
-using Microsoft.AspNetCore.WebUtilities;
 using System.IO.Compression;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Unicode;
 using System.Xml.Linq;
 using VersOne.Epub;
 
@@ -95,4 +96,34 @@ public static class Utils
     }
 
     public static JsonSerializerOptions JsonSerializerOptions { get; set; } = new() { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+
+    public static int GetPort(int preferredPort = 5000)
+    {
+        var tcpEndPoints = IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners();
+        if (!tcpEndPoints.Select(p => p.Port).Contains(preferredPort))
+            return preferredPort;
+
+        using var random = new TcpListener(IPAddress.IPv6Any, 0);
+        random.Start();
+        int freePort = ((IPEndPoint)random.LocalEndpoint).Port;
+        random.Stop();
+
+        Console.WriteLine($"Port {preferredPort} is in use, returning port {freePort}.");
+        return freePort;
+    }
+
+    public static IEnumerable<IPAddress> GetAllOperationalIPs()
+    {
+        foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
+        {
+            if (ni.OperationalStatus != OperationalStatus.Up ||
+                ni.NetworkInterfaceType == NetworkInterfaceType.Loopback)
+                continue;
+
+            foreach (var ip in ni.GetIPProperties().UnicastAddresses.Select(ua => ua.Address))
+                if (ip.AddressFamily == AddressFamily.InterNetwork || ip.AddressFamily == AddressFamily.InterNetworkV6)
+                    if (!IPAddress.IsLoopback(ip) && !ip.IsIPv6LinkLocal && !ip.IsIPv6Teredo)
+                        yield return ip;
+        }
+    }
 }

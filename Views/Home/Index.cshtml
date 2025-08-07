@@ -149,10 +149,6 @@
     const toAnchor = new URLSearchParams(window.location.search).get('toAnchor');
     scrollToAnchor(toIframe, toAnchor);
   });
-
-  window.addEventListener("DOMContentLoaded", () => {
-    if (window.innerWidth < 576) toggleSidebar();
-  });
 </script>
 
 <div id="reader-container">
@@ -183,12 +179,13 @@
 </button>
 
 @section Scripts {
-  <script defer>
+  <script>
     scrolled();
 
     const sidebarTitleContainer = document.querySelector('#sidebar-title-container');
     const sidebarNav = document.querySelector('#sideBar > ul.nav');
     sidebarTitleContainer.style.maxWidth = `${sidebarNav.offsetWidth}px`;
+    if (window.innerWidth < 576) toggleSidebar();
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {

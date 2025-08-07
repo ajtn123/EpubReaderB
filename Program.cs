@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using EpubReaderB;
 
 Task<bool>? task = args.Length > 0 ? EpubInfo.InitializeBook(new FileInfo(args[0])) : null;
@@ -30,6 +31,18 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+var port = Utils.GetPort();
+
+Console.WriteLine("EpubReaderB is available at:");
+Console.ForegroundColor = ConsoleColor.Green;
+foreach (var ip in Utils.GetAllOperationalIPs())
+    if (ip.AddressFamily == AddressFamily.InterNetworkV6)
+        Console.WriteLine($"  http://[{ip}]:{port}");
+    else
+        Console.WriteLine($"  http://{ip}:{port}");
+Console.WriteLine($"  http://localhost:{port}");
+Console.ResetColor();
+
 if (task != null) await task;
 
-app.Run("http://+:5000");
+app.Run($"http://+:{port}");
