@@ -45,6 +45,12 @@
                                     Navigation
                                 </a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Cover">Cover</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="ResourceIndex">
+                                    Resource Index
+                                </a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Gallery">
+                                    Gallery
+                                </a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="About">About</a>
                             </ul>
                         </li>
@@ -54,8 +60,8 @@
         </nav>
     </header>
 
-    <div id="drag-mask">
-        <span id="drag-text">Drop to open</span>
+    <div id="drop-area">
+        <span id="drop-text">Drop to open</span>
     </div>
 
     <main role="main">

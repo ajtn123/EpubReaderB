@@ -16,6 +16,10 @@ public class HomeController(ILogger<HomeController> logger) : Controller
 
     public IActionResult About() => View(new AboutViewModel(EpubInfo.EpubBook));
 
+    public IActionResult ResourceIndex() => View(new ResourceIndexViewModel(EpubInfo.EpubBook));
+
+    public IActionResult Gallery() => View(new GalleryViewModel(EpubInfo.EpubBook));
+
     public IActionResult Privacy() => View();
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

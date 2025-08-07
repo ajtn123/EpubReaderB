@@ -7,6 +7,7 @@ namespace EpubReaderB.Controllers;
 public class ResourceController : Controller
 {
     private static readonly Dictionary<string, (byte[] Content, string MimeType)> _files = [];
+    public static Dictionary<string, (byte[] Content, string MimeType)> Files => _files;
 
     [HttpGet("/resources/{*name}")]
     public IActionResult Get(string name)
@@ -33,6 +34,7 @@ public class ResourceController : Controller
 
     public static bool AddResAll(EpubBook book)
     {
+        _files.Clear();
         foreach (var res in book.Content.AllFiles.Local)
             if (res is EpubLocalTextContentFile t) AddRes(t);
             else if (res is EpubLocalByteContentFile b) AddRes(b);

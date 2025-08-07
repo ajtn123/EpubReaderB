@@ -1,0 +1,36 @@
+@using EpubReaderB.Controllers
+@model ResourceIndexViewModel
+@{
+    ViewData["BookTitle"] = Model.BookTitle;
+    ViewData["Title"] = Model.Title;
+    ViewData["BookCopyright"] = Model.BookCopyright;
+}
+
+<div class="p-5">
+    <h1>@ViewData["Title"]</h1>
+    <table class="table">
+        <thead>
+            <tr class="table-light">
+                <th scope="col">Key</th>
+                <th scope="col">MIME Type</th>
+                <th scope="col" class="table-right">Size</th>
+                <th scope="col" class="table-right">Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var res in ResourceController.Files)
+            {
+                <tr>
+                    <th scope="row">@res.Key</th>
+                    <td>@res.Value.MimeType</td>
+                    <td class="table-right" title="@res.Value.Content.Length">
+                        @Utils.BytesToString(res.Value.Content.Length)
+                    </td>
+                    <td class="table-right">
+                        <a href="/resources/@res.Key" target="_blank"><i class="bi bi-box-arrow-up-right"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

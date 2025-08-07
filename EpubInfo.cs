@@ -3,57 +3,64 @@ using VersOne.Epub;
 
 namespace EpubReaderB;
 
-public static class EpubInfo
+public class EpubInfo
 {
     public static async Task<bool> InitializeBook(FileInfo file)
     {
-        EpubFile = file;
+        EpubInfo epubInfo = new() { File = file };
 
         Stream? stream = null;
-        if (EpubFile != null && EpubFile.Exists)
+        if (epubInfo.File != null && epubInfo.File.Exists)
             try
             {
-                Console.WriteLine($"Reading file: {EpubFile.FullName}");
-                stream = new MemoryStream(await File.ReadAllBytesAsync(EpubFile.FullName));
+                Console.WriteLine($"Reading file: {epubInfo.File.FullName}");
+                stream = new MemoryStream(await System.IO.File.ReadAllBytesAsync(epubInfo.File.FullName));
             }
             catch (Exception e) { Console.WriteLine(e.Message); }
 
         if (stream != null) return await InitializeBook(stream);
-        else return IsInitialized = false;
+        else return epubInfo.IsInitialized = false;
     }
 
-    public static async Task<bool> InitializeBook(Stream stream)
+    public static async Task<bool> InitializeBook(Stream stream, EpubInfo? epubInfo = null)
     {
-        EpubStream?.Dispose();
-        EpubStream = stream;
+        epubInfo ??= new();
+        epubInfo.Stream = stream;
 
-        EpubBook = null;
-        if (EpubStream != null)
+        if (epubInfo.Stream != null)
             try
             {
-                EpubBook = await EpubReader.ReadBookAsync(EpubStream.Clone());
+                epubInfo.Book = await EpubReader.ReadBookAsync(epubInfo.Stream.Clone());
             }
             catch (Exception e) { Console.WriteLine(e.Message); }
 
-        if (EpubBook == null || EpubStream == null)
-            return IsInitialized = false;
+        if (epubInfo.Book == null || epubInfo.Stream == null)
+            return epubInfo.IsInitialized = false;
 
-        _ = ResourceController.AddResAll(EpubBook);
+        CurrentBook = epubInfo;
 
-        Utils.Deobfuscate(EpubBook, EpubStream);
+        _ = ResourceController.AddResAll(epubInfo.Book);
 
-        if (File.Exists("styles.css"))
-            Styles = await File.ReadAllTextAsync("styles.css");
+        Utils.Deobfuscate(epubInfo.Book, epubInfo.Stream);
+
+        if (System.IO.File.Exists("styles.css"))
+            Styles = await System.IO.File.ReadAllTextAsync("styles.css");
         else Styles = "";
 
-        return IsInitialized = true;
+        return epubInfo.IsInitialized = true;
     }
 
-    public static bool IsInitialized { get; private set; } = false;
+    public bool IsInitialized { get; private set; } = false;
 
-    public static FileInfo? EpubFile { get; set; }
-    public static Stream? EpubStream { get; set; }
-    public static EpubBook? EpubBook { get; set; }
+    public FileInfo? File { get; set; }
+    public Stream? Stream { get; set; }
+    public EpubBook? Book { get; set; }
+
+    public static FileInfo? EpubFile => CurrentBook?.File;
+    public static Stream? EpubStream => CurrentBook?.Stream;
+    public static EpubBook? EpubBook => CurrentBook?.Book;
+
+    public static EpubInfo? CurrentBook { get; private set; }
 
     public static string Styles { get; set; } = "";
 }
