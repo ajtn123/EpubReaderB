@@ -6,7 +6,7 @@ namespace EpubReaderB.Controllers;
 
 public class ResourceController : Controller
 {
-    private static DateTime timeAdded;
+    public static string? ServingBookUID { get; set; }
     private static readonly Dictionary<string, (byte[] Content, string MimeType)> _files = [];
     public static Dictionary<string, (byte[] Content, string MimeType)> Files => _files;
 
@@ -17,11 +17,10 @@ public class ResourceController : Controller
             return NotFound();
         else if (_files.TryGetValue(name, out var file))
         {
-            var ifModifiedSince = Request.Headers.IfModifiedSince.ToString();
-            if (DateTime.TryParse(ifModifiedSince, out var since) && since >= timeAdded)
+            if (Request.Headers.IfNoneMatch.FirstOrDefault() == ServingBookUID)
                 return StatusCode(StatusCodes.Status304NotModified);
 
-            Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.LastModified] = timeAdded.ToString("R");
+            Response.Headers.ETag = ServingBookUID;
 
             // Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
             // {
@@ -50,8 +49,9 @@ public class ResourceController : Controller
     public static bool AddResAll(EpubBook book)
     {
         _files.Clear();
-        var now = DateTime.Now;
-        timeAdded = new DateTime(now.Ticks - (now.Ticks % TimeSpan.TicksPerSecond), DateTimeKind.Utc);
+        ServingBookUID = book.Schema.Package.Metadata.Identifiers
+                .FirstOrDefault(a => a?.Id == book.Schema.Package.UniqueIdentifier, null)?
+                .Identifier ?? $"MissingUID-{DateTime.Now.Ticks}";
 
         foreach (var res in book.Content.AllFiles.Local)
             if (res is EpubLocalTextContentFile t) AddRes(t);
