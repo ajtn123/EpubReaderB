@@ -3,7 +3,7 @@ using VersOne.Epub;
 
 namespace EpubReaderB;
 
-public class EpubInfo
+public class EpubInfo : IDisposable
 {
     public static async Task<bool> InitializeBook(FileInfo file)
     {
@@ -37,6 +37,8 @@ public class EpubInfo
         if (epubInfo.Book == null || epubInfo.Stream == null)
             return epubInfo.IsInitialized = false;
 
+        CurrentBook?.Dispose();
+
         CurrentBook = epubInfo;
 
         _ = ResourceController.AddResAll(epubInfo.Book);
@@ -48,6 +50,12 @@ public class EpubInfo
         else Styles = "";
 
         return epubInfo.IsInitialized = true;
+    }
+
+    public void Dispose()
+    {
+        Stream?.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     public bool IsInitialized { get; private set; } = false;
