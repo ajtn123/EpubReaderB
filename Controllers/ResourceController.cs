@@ -6,6 +6,7 @@ namespace EpubReaderB.Controllers;
 
 public class ResourceController : Controller
 {
+    private static DateTime timeAdded;
     private static readonly Dictionary<string, (byte[] Content, string MimeType)> _files = [];
     public static Dictionary<string, (byte[] Content, string MimeType)> Files => _files;
 
@@ -15,7 +16,21 @@ public class ResourceController : Controller
         if (name == null)
             return NotFound();
         else if (_files.TryGetValue(name, out var file))
+        {
+            var ifModifiedSince = Request.Headers.IfModifiedSince.ToString();
+            if (DateTime.TryParse(ifModifiedSince, out var since) && since >= timeAdded)
+                return StatusCode(StatusCodes.Status304NotModified);
+
+            Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.LastModified] = timeAdded.ToString("R");
+
+            // Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
+            // {
+            //    Public = true,
+            //    MaxAge = TimeSpan.FromDays(1)
+            // };
+
             return File(file.Content, file.MimeType);
+        }
         else if (Uri.TryCreate(name, UriKind.Absolute, out _))
             return Redirect(name);
         else
@@ -35,6 +50,9 @@ public class ResourceController : Controller
     public static bool AddResAll(EpubBook book)
     {
         _files.Clear();
+        var now = DateTime.Now;
+        timeAdded = new DateTime(now.Ticks - (now.Ticks % TimeSpan.TicksPerSecond), DateTimeKind.Utc);
+
         foreach (var res in book.Content.AllFiles.Local)
             if (res is EpubLocalTextContentFile t) AddRes(t);
             else if (res is EpubLocalByteContentFile b) AddRes(b);
