@@ -7,6 +7,10 @@
     <ApplicationIcon>EpubReader.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
   <ItemGroup>
     <Content Include="EpubReader.ico" />
   </ItemGroup>
