@@ -1,24 +1,25 @@
 using EpubReaderB.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using System.Diagnostics;
 
 namespace EpubReaderB.Controllers;
 
-public class HomeController(ILogger<HomeController> logger) : Controller
+public class HomeController(IStringLocalizer<HomeController> sl) : Controller
 {
-    private readonly ILogger<HomeController> _logger = logger;
+    private readonly IStringLocalizer<HomeController> localizer = sl;
 
-    public IActionResult Index() => View(new ReaderViewModel(EpubInfo.EpubBook));
+    public IActionResult Index() => View(new ReaderViewModel(EpubInfo.EpubBook, localizer));
 
-    public IActionResult Cover() => View(new CoverViewModel(EpubInfo.EpubBook));
+    public IActionResult Cover() => View(new CoverViewModel(EpubInfo.EpubBook, localizer));
 
-    public IActionResult NavPage() => View(new NavPageViewModel(EpubInfo.EpubBook));
+    public IActionResult NavPage() => View(new NavPageViewModel(EpubInfo.EpubBook, localizer));
 
-    public IActionResult About() => View(new AboutViewModel(EpubInfo.EpubBook));
+    public IActionResult About() => View(new AboutViewModel(EpubInfo.EpubBook, localizer));
 
-    public IActionResult ResourceIndex() => View(new ResourceIndexViewModel(EpubInfo.EpubBook));
+    public IActionResult ResourceIndex() => View(new ResourceIndexViewModel(EpubInfo.EpubBook, localizer));
 
-    public IActionResult Gallery() => View(new GalleryViewModel(EpubInfo.EpubBook));
+    public IActionResult Gallery() => View(new GalleryViewModel(EpubInfo.EpubBook, localizer));
 
     public IActionResult Privacy() => View();
 

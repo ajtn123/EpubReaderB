@@ -1,4 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Html
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer localizer
 @model ReaderViewModel
 @{
   ViewData["BookTitle"] = Model.BookTitle;
@@ -171,11 +173,11 @@
 </div>
 
 <button id="goBackBtn" class="btn btn-primary position-fixed bottom-0 end-0 m-3" onclick="goBack();">
-  <i class="bi bi-arrow-90deg-up"></i> Back
+  <i class="bi bi-arrow-90deg-up"></i> @localizer["GoBack"]
 </button>
 
 <button id="sidebarToggleBtn" class="btn btn-primary position-fixed bottom-0 start-0 m-3" onclick="toggleSidebar();">
-  <i class="bi bi-toggle-off"></i> Sidebar
+  <i class="bi bi-toggle-off"></i> @localizer["Sidebar"]
 </button>
 
 @section Scripts {

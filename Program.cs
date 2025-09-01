@@ -1,7 +1,7 @@
 using System.Net.Sockets;
 using EpubReaderB;
 
-Task<bool>? task = args.Length > 0 ? EpubInfo.InitializeBook(new FileInfo(args[0])) : null;
+Task<bool>? task = args.Length > 0 ? EpubInfo.InitializeBook(new FileInfo(args.FirstOrDefault(s => s.EndsWith(".epub"), args[0]))) : null;
 
 if (Environment.ProcessPath is string processPath)
     if (new FileInfo(processPath).DirectoryName is string dir)
@@ -9,8 +9,10 @@ if (Environment.ProcessPath is string processPath)
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddLocalization(options => options.ResourcesPath = "Localization");
+
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddViewLocalization();
 
 var app = builder.Build();
 
@@ -26,12 +28,22 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
+app.UseRequestLocalization(options =>
+{
+    var cultures = Config.Cultures;
+    options.AddSupportedCultures(cultures);
+    options.AddSupportedUICultures(cultures);
+    options.SetDefaultCulture(cultures[0]);
+
+    options.ApplyCurrentCultureToResponseHeaders = true;
+});
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-var port = Utils.GetPort();
+var port = Utils.GetPort(Config.PerferredPort);
 
 Console.WriteLine("EpubReaderB is available at:");
 Console.ForegroundColor = ConsoleColor.Green;

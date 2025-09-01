@@ -1,5 +1,12 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using EpubReaderB.Controllers
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@inject IHtmlLocalizer<HomeController> homeLocalizer
+@inject IHtmlLocalizer<Shared> sharedLocalizer
+@inject IViewLocalizer localizer
+
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.Name">
 
 <head>
     <meta charset="utf-8" />
@@ -18,7 +25,7 @@
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
                     <img src="~/assets/book.svg" />
-                    EpubReaderB
+                    @sharedLocalizer["EpubReaderB"]
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,16 +49,20 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="NavPage">
-                                    Navigation
+                                    @homeLocalizer["Navigation"]
                                 </a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Cover">Cover</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Cover">
+                                    @homeLocalizer["Cover"]
+                                </a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="ResourceIndex">
-                                    Resource Index
+                                    @homeLocalizer["ResourceIndex"]
                                 </a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Gallery">
-                                    Gallery
+                                    @homeLocalizer["Gallery"]
                                 </a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="About">About</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="About">
+                                    @homeLocalizer["About"]
+                                </a>
                             </ul>
                         </li>
                     </ul>
@@ -61,7 +72,7 @@
     </header>
 
     <div id="drop-area">
-        <span id="drop-text">Drop to open</span>
+        <span id="drop-text">@localizer["DropFile"]</span>
     </div>
 
     <main role="main">
@@ -71,8 +82,9 @@
     <footer class="border-top footer text-muted" style="overflow:auto;">
         <div class="container d-flex justify-content-between">
             <span>
-                <a href="https://github.com/ajtn123/EpubReaderB"><i class="bi bi-github"></i>EpubReaderB</a> - MIT
-                &copy; 2025 aoi - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                <a href="https://github.com/ajtn123/EpubReaderB">
+                    <i class="bi bi-github"></i>@sharedLocalizer["EpubReaderB"]</a> - MIT &copy; 2025 aoi -
+                <a asp-area="" asp-controller="Home" asp-action="Privacy">@homeLocalizer["Privacy"]</a>
             </span>
             <span style="margin-left: 2em;">
                 @ViewData["BookCopyright"]

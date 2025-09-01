@@ -1,4 +1,7 @@
-﻿@model CoverViewModel
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer localizer
+@inject IHtmlLocalizer<Shared> sharedLocalizer
+@model CoverViewModel
 @{
     ViewData["BookTitle"] = Model.BookTitle;
     ViewData["Title"] = Model.Title;
@@ -6,5 +9,5 @@
 }
 
 <img src="/resources/@Model.Book?.Content.Cover?.Key"
-    style="height: calc(100vh - 50px); width: 100%; object-fit: contain;" alt="Book Cover"
-    onerror="this.outerHTML='<span>This book does not have a cover.</span>';" />
+    style="height: calc(100vh - 50px); width: 100%; object-fit: contain;" alt="@sharedLocalizer["Cover"]"
+    onerror="this.outerHTML='<span>@localizer["NoCover"]</span>';" />

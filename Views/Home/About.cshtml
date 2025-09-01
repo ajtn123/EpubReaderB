@@ -1,4 +1,6 @@
-﻿@model AboutViewModel
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<Shared> sharedLocalizer
+@model AboutViewModel
 @{
     ViewData["BookTitle"] = Model.BookTitle;
     ViewData["Title"] = Model.Title;
@@ -21,7 +23,7 @@
             </div>
             <p class="text-area mb-0">@Model.Book?.Description</p>
         </div>
-        <img id="about-book-cover" src="/resources/@Model.Book?.Content.Cover?.Key" />
+        <img id="about-book-cover" src="/resources/@Model.Book?.Content.Cover?.Key" alt="@sharedLocalizer["Cover"]" />
     </div>
     <pre class="code-area">@Model.PackageInfo</pre>
     <p class="text-area">@Model.Rights</p>

@@ -1,4 +1,6 @@
 @using EpubReaderB.Controllers
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer localizer
 @model ResourceIndexViewModel
 @{
     ViewData["BookTitle"] = Model.BookTitle;
@@ -11,10 +13,10 @@
     <table class="table">
         <thead>
             <tr class="table-light">
-                <th scope="col">Key</th>
-                <th scope="col">MIME Type</th>
-                <th scope="col" class="table-right">Size</th>
-                <th scope="col" class="table-right">Link</th>
+                <th scope="col">@localizer["Key"]</th>
+                <th scope="col">@localizer["MimeType"]</th>
+                <th scope="col" class="table-right">@localizer["Size"]</th>
+                <th scope="col" class="table-right">@localizer["Link"]</th>
             </tr>
         </thead>
         <tbody>
