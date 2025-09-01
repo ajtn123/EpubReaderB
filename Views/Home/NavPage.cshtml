@@ -1,31 +1,35 @@
-﻿@model NavPageViewModel
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer localizer
+@model NavPageViewModel
 @{
-    ViewData["BookTitle"] = Model.BookTitle;
-    ViewData["Title"] = Model.Title;
-    ViewData["BookCopyright"] = Model.BookCopyright;
-    ViewData["NavHtmlErrorMessage"] = Model.Book?.Content.NavigationHtmlFile?.Key == null ? "This book does not have a nav page." : "";
+  ViewData["BookTitle"] = Model.BookTitle;
+  ViewData["Title"] = Model.Title;
+  ViewData["BookCopyright"] = Model.BookCopyright;
+  ViewData["NavHtmlErrorMessage"] = Model.Book?.Content.NavigationHtmlFile?.Key == null
+  ? localizer["NoNavPage"].Value : "";
 }
 
 <script src="~/js/iframeService.js" asp-append-version="true"></script>
 
 <script>
-    function scrollToAnchor(iframeId, anchorId) {
-      console.log('Scrolling to', iframeId + '#' + anchorId);
-      if (!iframeId) return;
-      const iframe = document.getElementById(iframeId);
-      if (iframe) {
-        scrollState.lastScrollY = window.scrollY;
-        if (anchorId) {
-          const doc = iframe.contentDocument;
-          const target = doc.getElementById(anchorId) || doc.querySelector(`[name='${anchorId}']`);
-          if (target) target.scrollIntoView({ behavior: 'smooth' });
-        } else iframe.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        window.location.href = `/?toIframe=${iframeId}&toAnchor=${anchorId}`;
-      }
+  function scrollToAnchor(iframeId, anchorId) {
+    console.log('Scrolling to', iframeId + '#' + anchorId);
+    if (!iframeId) return;
+    const iframe = document.getElementById(iframeId);
+    if (iframe) {
+      scrollState.lastScrollY = window.scrollY;
+      if (anchorId) {
+        const doc = iframe.contentDocument;
+        const target = doc.getElementById(anchorId) || doc.querySelector(`[name='${anchorId}']`);
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      } else iframe.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.location.href = `/?toIframe=${iframeId}&toAnchor=${anchorId}`;
     }
+  }
 </script>
 
-<iframe src="/resources/@Model.Book?.Content.NavigationHtmlFile?.Key" onload="resizeIframe(this); injectScript(this);"></iframe>
+<iframe src="/resources/@Model.Book?.Content.NavigationHtmlFile?.Key"
+  onload="resizeIframe(this); injectScript(this);"></iframe>
 
-<span>@ViewData["NavHtmlErrorMessage"]</span>
+<span class="m-5">@ViewData["NavHtmlErrorMessage"]</span>
