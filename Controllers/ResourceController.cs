@@ -22,12 +22,6 @@ public class ResourceController : Controller
 
             Response.Headers.ETag = ServingBookUID;
 
-            // Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
-            // {
-            //    Public = true,
-            //    MaxAge = TimeSpan.FromDays(1)
-            // };
-
             return File(file.Content, file.MimeType);
         }
         else if (Uri.TryCreate(name, UriKind.Absolute, out _))

@@ -3,27 +3,26 @@
 @inject IViewLocalizer localizer
 @model ReaderViewModel
 @{
-  ViewData["BookTitle"] = Model.BookTitle;
-  ViewData["Title"] = Model.Title;
-  ViewData["BookCopyright"] = Model.BookCopyright;
+    ViewData["BookTitle"] = Model.BookTitle;
+    ViewData["Title"] = Model.Title;
+    ViewData["BookCopyright"] = Model.BookCopyright;
 
-  IHtmlContent RenderNavItems(IEnumerable<VersOne.Epub.EpubNavigationItem> items) =>
-  new Func<object?, IHtmlContent>(
-  @<ul class="nav nav-pills flex-column mb-auto" style="padding-left: 0.5em">
-  @foreach (var item in items)
-  {
-      <li class="nav-item">
-        <a class="nav-link link-dark"
-          data-iframe="@item.Link?.ContentFilePath.Substring((item.Link?.ContentFilePath.IndexOf('/') ?? -1) + 1)"
-          data-a="@item.Link?.Anchor" onclick="scrollToAnchor(this.dataset.iframe, this.dataset.a);">@item.Title</a>
-        @if (item.NestedItems != null && item.NestedItems.Any())
-        {
-          @RenderNavItems(item.NestedItems)
-        }
-      </li>
-  }
-</ul>
-)(null);
+    IHtmlContent RenderNavItems(IEnumerable<VersOne.Epub.EpubNavigationItem> items) => new Func<object?, IHtmlContent>(
+        @<ul class="nav nav-pills flex-column mb-auto" style="padding-left: 0.5em">
+            @foreach (var item in items)
+            {
+                <li class="nav-item">
+                    <a class="nav-link link-dark"
+                       data-iframe="@item.Link?.ContentFilePath.Substring((item.Link?.ContentFilePath.IndexOf('/') ?? -1) + 1)"
+                       data-a="@item.Link?.Anchor" onclick="scrollToAnchor(this.dataset.iframe, this.dataset.a);">@item.Title</a>
+                    @if (item.NestedItems != null && item.NestedItems.Any())
+                    {
+                      @RenderNavItems(item.NestedItems)
+                    }
+                </li>
+            }
+        </ul>
+    )(null);
 }
 
 <script src="~/js/iframeService.js" asp-append-version="true"></script>
@@ -155,10 +154,6 @@
 
 <div id="reader-container">
   <div id="sideBar" class="flex-column flex-shrink-0 p-3 bg-light">
-    <div id="sidebar-title-container" style="display: none;">
-      <h2>@ViewData["Title"]</h2>
-      <hr />
-    </div>
     @RenderNavItems(Model.Book?.Navigation ?? [])
   </div>
 
@@ -183,32 +178,5 @@
 @section Scripts {
   <script>
     scrolled();
-
-    const sidebarTitleContainer = document.querySelector('#sidebar-title-container');
-    const sidebarNav = document.querySelector('#sideBar > ul.nav');
-    sidebarTitleContainer.style.maxWidth = `${sidebarNav.offsetWidth}px`;
-    if (window.innerWidth < 576) toggleSidebar();
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          // Nav bar is visible
-          sidebarTitleContainer.style.display = 'none';
-        } else {
-          // Nav bar is invisible
-          sidebarTitleContainer.style.display = 'block';
-        }
-      });
-    }, { threshold: 0 });
-    observer.observe(document.querySelector('.navbar'));
-
-    let timeout;
-    window.addEventListener('resize', () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        sidebarTitleContainer.style.display = 'none';
-        sidebarTitleContainer.style.maxWidth = `${sidebarNav.offsetWidth}px`;
-        sidebarTitleContainer.style.display = 'block';
-      }, 100);
-    });
   </script>
 }

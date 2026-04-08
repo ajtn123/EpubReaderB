@@ -95,7 +95,12 @@ public static class Utils
         return cloned;
     }
 
-    public static JsonSerializerOptions JsonSerializerOptions { get; set; } = new() { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+    public static JsonSerializerOptions JsonSerializerOptions { get; set; } = new()
+    {
+        WriteIndented = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+    };
 
     public static int GetPort(int preferredPort = 5000)
     {
@@ -137,5 +142,21 @@ public static class Utils
         int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
         double num = Math.Round(bytes / Math.Pow(1024, place), 1);
         return $"{Math.Sign(byteCount) * num} {suf[place]}";
+    }
+
+    public static IEnumerable<T> Flatten<T>(this IEnumerable<T> source, Func<T, IEnumerable<T>> childrenSelector)
+    {
+        foreach (var item in source)
+        {
+            yield return item;
+            var children = childrenSelector(item);
+            if (children != null)
+            {
+                foreach (var child in Flatten(children, childrenSelector))
+                {
+                    yield return child;
+                }
+            }
+        }
     }
 }
