@@ -5,7 +5,6 @@
     ViewData["BookTitle"] = Model.BookTitle;
     ViewData["Title"] = Model.Title;
     ViewData["BookCopyright"] = Model.BookCopyright;
-    ViewData["NavHtmlErrorMessage"] = Model.Book?.Content.NavigationHtmlFile?.Key == null ? localizer["NoNavPage"].Value : "";
 
     var navigations = Model.Book?.Navigation?.Flatten(nav => nav.NestedItems);
 }
@@ -33,7 +32,7 @@
 <iframe src="/resources/@Model.Book?.Content.NavigationHtmlFile?.Key"
   onload="resizeIframe(this); injectScript(this);"></iframe>
 
-<div class="card container-sm p-0 mt-3" style="margin-bottom: 10rem;">
+<div class="card container-sm p-0 my-3">
     <div class="card-header border-0" role="button"
          data-bs-toggle="collapse" href="#file-list">
         目录

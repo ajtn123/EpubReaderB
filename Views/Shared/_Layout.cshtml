@@ -79,14 +79,12 @@
         @RenderBody()
     </main>
 
-    <footer class="border-top text-secondary lh-lg" style="overflow:auto;">
-        <div class="container d-flex justify-content-between">
+    <footer class="border-top text-secondary lh-lg">
+        <div class="container d-flex gap-3 justify-content-between">
             <span>
-                <a href="https://github.com/ajtn123/EpubReaderB">
-                    <i class="bi bi-github"></i>@sharedLocalizer["EpubReaderB"]</a> - MIT &copy; 2025 aoi -
-                <a asp-area="" asp-controller="Home" asp-action="Privacy">@homeLocalizer["Privacy"]</a>
+                @sharedLocalizer["EpubReaderB"]
             </span>
-            <span style="margin-left: 2em;">
+            <span>
                 @ViewData["BookCopyright"]
             </span>
         </div>
