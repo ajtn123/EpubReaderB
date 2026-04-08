@@ -29,8 +29,11 @@
   }
 </script>
 
-<iframe src="/resources/@Model.Book?.Content.NavigationHtmlFile?.Key"
-  onload="resizeIframe(this); injectScript(this);"></iframe>
+@if (Model.Book?.Content.NavigationHtmlFile is { } navHtml)
+{
+    <iframe src="/resources/@navHtml.Key"
+            onload="resizeIframe(this); injectScript(this);"></iframe>
+}
 
 <div class="card container-sm p-0 my-3">
     <div class="card-header border-0" role="button"
