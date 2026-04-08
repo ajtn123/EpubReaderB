@@ -35,25 +35,28 @@
             onload="resizeIframe(this); injectScript(this);"></iframe>
 }
 
-<div class="card container-sm p-0 my-3">
-    <div class="card-header border-0" role="button"
-         data-bs-toggle="collapse" href="#file-list">
-        目录
+@if (Model.Book?.ReadingOrder?.Any() ?? false)
+{
+    <div class="card container-sm p-0 my-3">
+        <div class="card-header border-0" role="button"
+             data-bs-toggle="collapse" href="#file-list">
+            目录
+        </div>
+        <div class="list-group list-group-flush border-top collapse show" id="file-list">
+            @foreach (var chapter in Model.Book.ReadingOrder)
+            {
+                <a class="list-group-item list-group-item-action hover-region" href="/resources/@chapter.Key">
+                    @if (navigations?.FirstOrDefault(nav => nav.Link?.ContentFilePath.Contains(chapter.Key) ?? false) is { } nav)
+                    {
+                        <span>@nav.Title</span>
+                        <span class="text-secondary hover-element">@chapter.Key</span>
+                    }
+                    else
+                    {
+                        <span>@chapter.Key</span>
+                    }
+                </a>
+            }
+        </div>
     </div>
-    <div class="list-group list-group-flush border-top collapse show" id="file-list">
-        @foreach (var chapter in Model.Book?.ReadingOrder ?? [])
-        {
-            <a class="list-group-item list-group-item-action hover-region" href="/resources/@chapter.Key">
-                @if (navigations?.FirstOrDefault(nav => nav.Link?.ContentFilePath.Contains(chapter.Key) ?? false) is { } nav)
-                {
-                    <span>@nav.Title</span>
-                    <span class="text-secondary hover-element">@chapter.Key</span>
-                }
-                else
-                {
-                    <span>@chapter.Key</span>
-                }
-            </a>
-        }
-    </div>
-</div>
+}
