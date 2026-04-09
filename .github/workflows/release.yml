@@ -24,7 +24,7 @@ jobs:
         run: zip -r ${{ github.event.repository.name }}-${{ github.ref_name }}-win-x64.zip ./publish
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: app-archive
           path: ${{ github.event.repository.name }}-${{ github.ref_name }}-*.zip
@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: app-archive
           path: .
